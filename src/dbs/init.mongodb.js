@@ -12,7 +12,7 @@ class Database {
     }
 
     connect(type = 'mongodb') {
-        if (1 === 1) {
+        if (1 === 1) { //dev
             mongoose.set('debug', true)
             mongoose.set('debug', { color: true })
         }
