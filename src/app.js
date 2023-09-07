@@ -17,7 +17,7 @@ app.use(bodyParser.json()) //or express.json()
 /* app.use(morgan('combined'))
  app.use(morgan('common'))
  app.use(morgan('short'))
- app.use(morgan('ti'))
+ app.use(morgan('tiny'))
 */
 
 // init db
@@ -29,13 +29,19 @@ countConnect()
 // init routes
 app.use('/', router)
 
-// app.get('/', (req, res, next) => {
-
-//     return res.status(200).json({
-//         message: 'Welcome!',
-//         // metadata: strCompress.repeat(1000)
-//     })
-// })
-
 // handling err
+app.use((req, res, next) => {
+    const err = new Error('Not Found'); //error message
+    err.status = 404; //error status
+    next(err) // send err data to another middleware handling
+})
+
+app.use((err, req, res, next) => {
+    const status = err.status || 500
+    return res.status(status).json({
+        status: 'error',
+        code: status,
+        message: err.message || "Internal server error"
+    })
+})
 module.exports = app

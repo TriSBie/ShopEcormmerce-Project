@@ -6,7 +6,7 @@ const strConnection = `mongodb+srv://buiductri2002:tri2072002@cluster0.obvzh1x.m
 const { countConnect } = require("../helpers/check.connect")
 
 
-class Database {
+class Database { //create single Class with Singeleton Pattern
     constructor() {
         this.connect()
     }

@@ -22,13 +22,17 @@ const keyTokenSchema = new Schema({
         type: String,
         required: true
     },
-    refreshToken: { //apply for detech token
+    refreshTokenUsed: { // stores all refreshToken has been used
         type: Array,
         default: []
+    },
+    refreshToken: { // stores the current being used 
+        type: String,
+        drequire: true
     }
 }, {
     timestamps: true,
     collection: COLLECTION_NAME
 })
 
-module.exports = model(COLLECTION_NAME, keyTokenSchema)
+module.exports = model(DOCUMENT_NAME, keyTokenSchema)

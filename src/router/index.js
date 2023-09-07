@@ -1,16 +1,18 @@
 'use strict'
 
+// ROOT ROUTER
 const express = require("express")
+const apiKey = require("../auth/checkAuth")
+const { permission } = require("../services/apiKey.services")
 const router = express.Router()
+
+//api key
+router.use(apiKey)
+
+//check permission
+router.use(permission('0000'))
 
 
 router.use('/v1/api', require("./access/index"))
-// router.get('', (req, res, next) => {
-
-//     return res.status(200).json({
-//         message: 'Welcome!',
-//         // metadata: strCompress.repeat(1000)
-//     })
-// })
 
 module.exports = router
