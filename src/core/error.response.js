@@ -1,16 +1,8 @@
 'use strict'
 
-const StatusCode = {
-    FORBIDDEN: 403,
-    CONFLICT: 409,
-    UNAUTHORIZED: 401
-}
+const ReasonPhrases = require("./reasonPhrases")
+const StatusCode = require("./statusCodes")
 
-const ReasonError = {
-    FORBIDDEN: "Bad request error",
-    CONFLICT: "Conflict Error",
-    UNAUTHORIZED: "Not Authorization"
-}
 
 class ErrorResponse extends Error {
     constructor(message, status) {
@@ -20,7 +12,7 @@ class ErrorResponse extends Error {
 }
 
 class ConflictRequestError extends ErrorResponse {
-    constructor(message = ReasonError.CONFLICT, statusCode = StatusCode.CONFLICT) {
+    constructor(message = ReasonPhrases.CONFLICT, statusCode = StatusCode.CONFLICT) {
         super(message, statusCode);
     }
     getNotice = () => {
@@ -32,7 +24,7 @@ class ConflictRequestError extends ErrorResponse {
 }
 
 class BadRequestError extends ErrorResponse {
-    constructor(message = ReasonError.FORBIDDEN, statusCode = StatusCode.FORBIDDEN) {
+    constructor(message = ReasonPhrases.FORBIDDEN, statusCode = StatusCode.FORBIDDEN) {
         console.log(message)
         super(message, statusCode)
     }
@@ -45,7 +37,7 @@ class BadRequestError extends ErrorResponse {
 }
 
 class AuthFailureError extends ErrorResponse {
-    constructor(message = ReasonError.UNAUTHORIZED, statusCode = StatusCode.UNAUTHORIZED) {
+    constructor(message = ReasonPhrases.UNAUTHORIZED, statusCode = StatusCode.UNAUTHORIZED) {
         console.log(message)
         super(message, statusCode)
     }
@@ -56,4 +48,37 @@ class AuthFailureError extends ErrorResponse {
         }
     }
 }
-module.exports = { ConflictRequestError, BadRequestError, AuthFailureError }
+
+class NotFoundError extends ErrorResponse {
+    constructor(message = ReasonPhrases.NOT_FOUND, statusCode = StatusCode.NOT_FOUND) {
+        super(message, statusCode)
+    }
+
+    getNotice() {
+        return {
+            message: this.message,
+            statusCode: this.statusCode
+        }
+    }
+}
+
+
+class ForbiddenError extends ErrorResponse {
+    constructor(message = ReasonPhrases.FORBIDDEN, statusCode = StatusCode.FORBIDDEN) {
+        super(message, statusCode)
+    }
+
+    getNotice() {
+        return {
+            message: this.message,
+            statusCode: this.statusCode
+        }
+    }
+}
+module.exports = {
+    ConflictRequestError,
+    BadRequestError,
+    AuthFailureError,
+    NotFoundError,
+    ForbiddenError
+}

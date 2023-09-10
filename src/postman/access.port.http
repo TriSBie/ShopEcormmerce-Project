@@ -3,6 +3,8 @@
 POST {{url_dev}}/shop/login
 Content-Type: application/json
 x-api-key : 6d8de2735def76bca6b70d702eb1ae8160d39a740ef4fe31e5fcbbb5cf45a4f1d3893ae5660676f58dee30a16456dac285df46960875136260a5422fc755c2b5
+authorization : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NGY4ODRkMjNhNTRlN2QxNzFmZTMwMjUiLCJlbWFpbCI6ImJ1aWR1Y3RyaTIyOGQzQGdtYWlsLmNvbSIsImlhdCI6MTY5NDE1OTM1NiwiZXhwIjoxNjk0MzMyMTU2fQ.b-bPijWeFJJDgs9h8hpxdZVDAIBIZyV31on5ndEuOmQ
+x-client-id : 64f884d23a54e7d171fe3025
 
 {
     "email" : "buiductri228d3@gmail.com",

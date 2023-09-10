@@ -5,14 +5,15 @@ const { findById } = require("../services/apiKey.services");
 
 const HEADER = {
     API_KEY: 'x-api-key',
+    CLIENT_ID: 'x-client-id',
     AUTHORIZATION: 'authorization'
 }
 
 //middleware
 const apiKey = async (req, res, next) => {
     try {
+        // get api key from header
         const key = req.headers[HEADER.API_KEY]?.toString();
-        console.log(key)
         if (!key) {
             return res.status(403).json({
                 message: 'Forbidden Error'
