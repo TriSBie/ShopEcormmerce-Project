@@ -1,7 +1,7 @@
 'use strict'
 
 const { BadRequestError } = require("../core/error.response")
-const { product, clothing, electronic } = require("../models/product.model")
+const { product, clothing, electronic, furniture } = require("../models/product.model")
 
 class ProductFactory {
     /**
@@ -14,7 +14,9 @@ class ProductFactory {
             case "Clothing":
                 return new Clothing(payload).createProduct();
             case "Electronic":
-                return new Electronic(payload).createProduct()
+                return new Electronic(payload).createProduct();
+            case "Furniture":
+                return new Furniture(payload).createProduct();
             default:
                 throw new BadRequestError(`No given type available ${type}`)
         }
@@ -42,32 +44,47 @@ class Product {
         this.product_attributes = product_attributes
     }
 
-    async createProduct() {
-        return await product.create(this);
+    async createProduct(_id) {
+        return await product.create({ ...this, _id });
     }
 }
 
 class Clothing extends Product {
     async createProduct() {
-        const newClothing = await clothing.create(this.product_attributes);
+        const newClothing = await clothing.create({ ...this.product_attributes, product_shop: this.product_shop });
         if (!newClothing) throw new BadRequestError("Create a new Clothe failed !");
 
-        const newProduct = await super.createProduct();
+        const _id = newClothing._id;
+        const newProduct = await super.createProduct(_id);
         if (!newProduct) throw new BadRequestError("Create a new Product failed !");
 
-        return newProduct
+        return newProduct;
     }
 }
 
 class Electronic extends Product {
     async createProduct() {
-        const newElectronic = await electronic.create(this.product_attributes);
+        const newElectronic = await electronic.create({ ...this.product_attributes, product_shop: this.product_shop });
         if (!newElectronic) throw new BadRequestError("Create a new Electronic failed !");
 
-        const newProduct = await super.createProduct();
+        const _id = newElectronic._id;
+        const newProduct = await super.createProduct(_id);
         if (!newProduct) throw new BadRequestError("Create a new Product failed !");
 
-        return newProduct
+        return newProduct;
+    }
+}
+
+class Furniture extends Product {
+    async createProduct() {
+        const newFurniture = await furniture.create({ ...this.product_attributes, product_shop: this.product_shop });
+        if (!newFurniture) throw new BadRequestError("Create a new Furniture failed !");
+
+        const _id = newFurniture._id;
+        const newProduct = await super.createProduct(_id);
+        if (!newProduct) throw new BadRequestError("Create a new Product failed !");
+
+        return newProduct;
     }
 }
 
