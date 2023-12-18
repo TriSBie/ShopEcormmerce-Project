@@ -3,7 +3,7 @@
 // ROOT ROUTER
 const express = require("express")
 const apiKey = require("../auth/checkAuth")
-const { permission } = require("../services/apiKey.services")
+const { permission } = require("../auth/authUtils")
 const router = express.Router()
 
 //api key

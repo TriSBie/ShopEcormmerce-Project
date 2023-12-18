@@ -7,10 +7,14 @@ class ProductController {
 
     createProduct = async (req, res) => {
         const { type, payload } = req.body
+        const configPayload = {
+            ...payload,
+            product_shop: req?.user?.userId
+        }
         console.log({ type, payload });
         new SuccessResponses({
             message: 'Create new product successfully',
-            metadata: await ProductFactory.createProduct(type, payload)
+            metadata: await ProductFactory.createProduct(type, configPayload)
         }).send(res)
     }
 
