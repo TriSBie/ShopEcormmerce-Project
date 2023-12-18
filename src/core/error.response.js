@@ -13,6 +13,7 @@ class ErrorResponse extends Error {
 
 class ConflictRequestError extends ErrorResponse {
     constructor(message = ReasonPhrases.CONFLICT, statusCode = StatusCode.CONFLICT) {
+        console.log(message)
         super(message, statusCode);
     }
     getNotice = () => {
@@ -65,6 +66,7 @@ class NotFoundError extends ErrorResponse {
 
 class ForbiddenError extends ErrorResponse {
     constructor(message = ReasonPhrases.FORBIDDEN, statusCode = StatusCode.FORBIDDEN) {
+        console.log(message);
         super(message, statusCode)
     }
 

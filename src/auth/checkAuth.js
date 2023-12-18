@@ -2,32 +2,30 @@
 
 const { findById } = require("../services/apiKey.services");
 
-
 const HEADER = {
     API_KEY: 'x-api-key',
     CLIENT_ID: 'x-client-id',
     AUTHORIZATION: 'authorization'
 }
 
-//middleware
+//middleware applied for check apiAuth
 const apiKey = async (req, res, next) => {
     try {
-        // get api key from header
-        const key = req.headers[HEADER.API_KEY]?.toString();
+        const key = req.headers[HEADER.API_KEY]?.toString(); // get api key from header
+        console.log({ key });
         if (!key) {
             return res.status(403).json({
                 message: 'Forbidden Error'
             })
         }
-
-        //check objKey
-        const objKey = await findById(key);
+        const objKey = await findById(key); //check objKey
         if (!objKey) {
             return res.status(403).json({
                 message: 'Forbidden Error'
             })
         }
-        req.objKey = objKey // assigned to request object
+        /**objKey contain [key, permission, status */
+        req.objKey = objKey
         next()
     }
     catch (err) {
