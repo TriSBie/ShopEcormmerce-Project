@@ -9,26 +9,26 @@ const COLLECTION_NAME = 'Keys'
 const keyTokenSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
-        required: true,
+        require: true,
         // unique: true,
         ref: 'Shop',
         //index: true - use index to limit the number of documents it must scan
     },
     publicKey: {
         type: String,
-        required: true
+        require: true
     },
     privateKey: {
         type: String,
-        required: true
+        require: true
     },
     refreshTokenUsed: { // stores all refreshToken has been used
-        type: Array,
+        type: [String],
         default: []
     },
     refreshToken: { // stores the current being used 
         type: String,
-        drequire: true
+        require: true
     }
 }, {
     timestamps: true,

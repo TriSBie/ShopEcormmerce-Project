@@ -16,9 +16,11 @@ class Database { //create single Class with Singeleton Pattern
             mongoose.set('debug', true)
             mongoose.set('debug', { color: true })
         }
-        mongoose.connect(strConnection, {
-            maxPoolSize: 50 // by default : 100
-        }).then(_ => console.log(`Connected MongoDB success`))
+        mongoose
+            .connect(strConnection, {
+                maxPoolSize: 50 // by default : 100
+            })
+            .then(_ => console.log(`Connected MongoDB success`))
             .catch(err => console.log(`Error connection !`))
     }
 

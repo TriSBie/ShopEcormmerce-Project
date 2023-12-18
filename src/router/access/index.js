@@ -5,6 +5,7 @@ const router = express.Router()
 const accessController = require("../../controllers/access.controllers")
 const { asyncHandler } = require("../../helpers/asyncHandler")
 const { authentication } = require("../../auth/authUtils")
+
 //signUp
 router.post('/shop/signup', asyncHandler(accessController.signUp))
 router.post('/shop/login', asyncHandler(accessController.login))

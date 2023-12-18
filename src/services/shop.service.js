@@ -1,9 +1,9 @@
+const { ONE, TWO } = require("../const/app.const");
 const shopModel = require("../models/shop.model");
 
 const findByEmail = async ({ email, select = {
-    email: 1, password: 2, name: 1, status: 1, roles: 1,
-}
-}) => {
+    email: ONE, password: ONE, name: ONE, status: ONE, roles: ONE,
+} }) => {
     return shopModel.findOne({ email }).select(select).lean();
 }
 

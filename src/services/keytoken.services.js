@@ -3,46 +3,31 @@
 const keyModel = require("../models/key.model");
 
 const { Types } = require("mongoose");
+// generate refreshedKey and handy function of key's services
 class KeyTokenService {
     static createKeyToken = async ({ userId, publicKey, privateKey, refreshToken }) => {
         try {
-            //level 0
-
-            // publicKey is bufferType => transfers to String 
-            // const publicKeyString = publicKey.toString();
-
-            // const tokens = await keyModel.create({
-            //     user: userId,
-            //     publicKey,
-            //     privateKey
-            // })
-
-            // return tokens ? tokens.publicKey : null
-
-            //level xxx
-            console.log({ userId })
             const filter = {
                 user: userId
             }
-
             const update = {
                 publicKey, privateKey, refreshTokenUsed: [], refreshToken
             }
-
             const options = {
                 upsert: true, new: true
             }
-
-            //findOneAndUpdate is atomic -> not changed until save() or upsert 
+            // findOneAndUpdate is atomic -> not changed until save() or upsert 
             const tokens = await keyModel.findOneAndUpdate(
                 filter, update, options
             )
+
             return tokens ? tokens.publicKey : null;
         } catch (err) {
             console.log(err)
             return err
         }
     }
+
     static findById = async (userId) => {
         //cast string to Type Object Id
         return await keyModel.findOne({ user: new Types.ObjectId(userId) });
@@ -52,8 +37,10 @@ class KeyTokenService {
         return await keyModel.findByIdAndDelete(id)
     }
 
-    static findByRefreshTokenUsed = async (refreshkey) => {
-        return await keyModel.findOne({ refreshTokenUsed: refreshkey })
+    //  check whether refreshedToken has been used or not
+    static findByRefreshTokenUsed = async (refreshKey) => {
+        console.log("refreshKey: ", refreshKey)
+        return await keyModel.find({ refreshTokenUsed: refreshKey }).lean()
     }
 
     static findByRefreshToken = async (refreshToken) => {
