@@ -47,18 +47,22 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
 const authentication = asyncHandler(async (req, res, next) => {
     // 1. Check userId is missing ?
     const userId = req.headers?.[HEADER['CLIENT_ID']]; //get uerid logged in
+    console.log({ userId });
     if (!userId) {
         throw new AuthFailureError('Unanthenticated').getNotice();
     }
 
     // 2. get KeyServices [publicKey, privateKey, refreshTokenUsed, refreshToken]
     const keyStore = await KeyTokenService.findById(userId); //get refreshKey, publicKey & privateKey of that user already logged in
+    console.log({ keyStore });
+
     if (!keyStore) {
         throw new NotFoundError('Invalid token').getNotice();
     }
 
     // 3. verify token
     const accessToken = req.headers?.[HEADER['AUTHORIZATION']];
+    console.log({ accessToken });
     if (!accessToken) {
         throw new AuthFailureError('Invalid request').getNotice();
     }
