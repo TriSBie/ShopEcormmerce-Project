@@ -65,6 +65,51 @@ class AccessService {
         }
     }
 
+    /**
+     * 
+     * @param {*} user - parsed from JWT
+     * @param {*} keyStore - containing user's informative
+     * @param {*} refreshToken - contain current refreshToken (optional)
+     */
+    static handlerRefreshTokenV2 = async ({ keyStore, user, refreshToken }) => {
+        const { userId, email } = user;
+        const isObtainedRefreshedUsed = keyStore?.refreshTokenUsed.includes(refreshToken);
+
+        if (isObtainedRefreshedUsed) {
+            // remove old refreshed has been used
+            await KeyTokenService.deleteKeyById(userId);
+            throw new ForbiddenError("Something went wrong ! Please re-login again");
+        }
+
+        //  compare two refreshToken offcially stored vs current refreshToken
+        if (keyStore?.refreshToken !== refreshToken) {
+            throw new AuthFailureError("Shop is not registed")
+        }
+
+        //  check the validity of authenticated shop
+        const foundShop = await findByEmail({ email })
+        if (!foundShop) {
+            throw new AuthFailureError("Unauthenticated shop");
+        }
+
+        //create new accessKey & refreshKey
+        const tokens = await createTokenPair({ userId, email }, keyStore.publicKey, keyStore.privateKey)
+
+        //  updates new refreshKey & push refreshKed in used list
+        await keyStore.updateOne({
+            user: userId
+        }, {
+            $set: {
+                refreshToken: tokens.refreshToken
+            },
+            $addToSet: {
+                refreshTokenUsed: refreshToken
+            }
+        })
+        return {
+            user, tokens
+        }
+    }
     /**----------LOGOUT-----------
      * 1 - check permission
      * 2 - check refreshToken from logge in whether matches with token has created or not ?
