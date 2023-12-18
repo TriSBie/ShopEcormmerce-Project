@@ -8,7 +8,6 @@ const router = express.Router()
 
 //api key
 router.use(apiKey)
-
 //check permission
 router.use(permission('0000'))
 

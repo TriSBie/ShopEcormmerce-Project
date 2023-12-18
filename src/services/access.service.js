@@ -24,14 +24,27 @@ class AccessService {
 
     static handlerRefreshToken = async (refreshToken) => {
 
+        //  get all available list of refreshToken used
+        const foundToken = await KeyTokenService.findByRefreshTokenUsed(refreshToken);
+        console.log("foundToken: ", foundToken);
+
+        if (foundToken.length !== 0) {
+            const { userId, email } = await verifyJWT(refreshToken, foundToken.privateKey);
+            console.log(`[Data parsed from JWT]====: `, { userId, email });
+            //  Clear all refreshKeyUsed stored in database
+            await KeyTokenService.deleteKeyById(userId)
+            throw new ForbiddenError('Something went wrong ! Please re-login again !')
+        }
+
         const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
         if (!holderToken) {
             throw new AuthFailureError('Shop is not registered!');
         }
+
         // Encrypted data from jwt
         const { userId, email } = await verifyJWT(refreshToken, holderToken.privateKey)
-
         const foundShop = await findByEmail({ email });
+
         if (!foundShop) {
             throw new AuthFailureError('Shop is not registered')
         }
@@ -46,29 +59,10 @@ class AccessService {
             refreshTokenUsed: refreshToken
         })
 
-        //  get all available list of refreshToken used
-        const foundToken = await KeyTokenService.findByRefreshTokenUsed(refreshToken);
-        console.log("foundToken: ", foundToken);
-
-
-        //  refreshTokenUsed list not empty
-        if (foundToken.length !== 0) {
-            const { userId, email } = await verifyJWT(refreshToken, foundToken.privateKey);
-            console.log(`[Data parsed from JWT]====: `, { userId, email });
-            //  Clear all refreshKeyUsed stored in database
-            await KeyTokenService.deleteKeyById(userId)
-            throw new ForbiddenError('Something went wrong ! Please re-login again !')
+        return {
+            shop: getInfoData({ fields: ["_id", "name", "email"], object: foundShop }),
+            token
         }
-
-        // await holderToken.updateOne({
-        //     refreshToken: token.refreshToken,
-        //     refreshTokenUsed: refreshToken
-        // })
-
-        // return {
-        //     shop: getInfoData({ fields: ["_id", "name", "email"], object: foundShop }),
-        //     token
-        // }
     }
 
     /**----------LOGOUT-----------
@@ -140,7 +134,7 @@ class AccessService {
         try {
             //  step check the existence of email
             const holderShop = await shopModel.findOne({ email }).lean();
-
+            console.log({ holderShop });
             if (holderShop) {
                 // confirm that email has already exists in database (DUPLICATED)
 

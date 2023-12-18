@@ -79,7 +79,7 @@ const authentication = asyncHandler(async (req, res, next) => {
 //  token : payload data stored
 //  keySecret : publicKey, privateKey or SHA algorithms
 const verifyJWT = async (token, keySecret) => {
-    return await jwt.verify(token, keySecret)
+    return jwt.verify(token, keySecret)
 }
 
 module.exports = { createTokenPair, authentication, verifyJWT }
