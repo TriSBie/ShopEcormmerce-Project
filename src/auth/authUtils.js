@@ -7,9 +7,16 @@ const { asyncHandler } = require('../helpers/asyncHandler');
 const HEADER = {
     API_KEY: 'x-api-key',
     CLIENT_ID: 'x-client-id',
-    AUTHORIZATION: 'authorization'
+    AUTHORIZATION: 'authorization',
+    REFRESH_TOKEN: 'refresh-token',
 }
-
+/**
+ * 
+ * @param {*} payload : data to encrypted
+ * @param {*} publicKey : short-term key for accessKey creation
+ * @param {*} privateKey : long-term key for refreshKey creation
+ * @returns 
+ */
 const createTokenPair = async (payload, publicKey, privateKey) => {
     try {
         // jwt.sign(payload, privatekey, algorithm)
@@ -21,13 +28,6 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
         const refreshToken = jwt.sign(payload, privateKey, {
             expiresIn: '7 days'
         })
-
-        // jwt.verify(accessToken, publicKey, (err, decoded) => {
-        //     if (err) {
-        //         console.log('verify error: ' + err);
-        //     }
-        //     console.log('decode verify: ' + { decoded })
-        // })
         return { accessToken, refreshToken }
 
     } catch (err) {
@@ -42,7 +42,7 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
 * 4. check user in bds
 * 5. check keyStore with this userId
 * 6. Overall checked pass ? => move next middleware
-* 
+* => BUG! In some cases, user's accessToken has expired => get refreshToken instead !
 */
 const authentication = asyncHandler(async (req, res, next) => {
     // 1. Check userId is missing ?
@@ -81,6 +81,74 @@ const authentication = asyncHandler(async (req, res, next) => {
     }
 })
 
+/**
+* 1. Check userId is missing ?
+* 2. get RefreshToken
+* 3. verify token
+* 4. check user in bds
+* 5. check keyStore with this userId
+* 6. Overall checked pass ? => move next middleware
+* => BUG! In some cases, user's accessToken has expired => get refreshToken instead !
+*/
+const authenticationV2 = asyncHandler(async (req, res, next) => {
+    // 1. Check userId is missing ?
+    const userId = req.headers?.[HEADER['CLIENT_ID']]; //get uerid logged in
+    console.log({ userId });
+    if (!userId) {
+        throw new AuthFailureError('Unanthenticated').getNotice();
+    }
+
+    // 2. get KeyServices [publicKey, privateKey, refreshTokenUsed, refreshToken]
+    const keyStore = await KeyTokenService.findById(userId);
+    console.log({ keyStore });
+
+    if (!keyStore) {
+        throw new NotFoundError('Invalid token').getNotice();
+    }
+    // 2.1 get RefreshToken from headers
+    if (req.headers?.[HEADER['REFRESH_TOKEN']]) {
+        try {
+            //  jwt verify (checkedToken, secretOrPublicKey, (err, decoded))
+            const refreshToken = req.headers?.[HEADER['REFRESH_TOKEN']]
+            console.log({ refreshToken });
+            const decodedUser = jwt.verify(refreshToken, keyStore?.privateKey);
+            console.log({ decodedUser });
+            if (userId !== decodedUser?.userId) {
+                throw new AuthFailureError('Invalid userId').getNotice()
+            }
+
+            req.keyStore = keyStore;
+            req.user = decodedUser;
+            req.refreshToken = refreshToken;
+            return next();
+        } catch (err) {
+            throw err
+        }
+    }
+
+    // 3. verify token
+    const accessToken = req.headers?.[HEADER['AUTHORIZATION']];
+    console.log({ accessToken });
+
+    if (!accessToken) {
+        throw new AuthFailureError('Invalid request').getNotice();
+    }
+    try {
+        //  jwt verify (checkedToken, secretOrPublicKey, (err, decoded))
+        const decodedUser = jwt.verify(accessToken, keyStore?.publicKey);
+
+        if (userId !== decodedUser?.userId) {
+            throw new AuthFailureError('Invalid userId').getNotice()
+        }
+        req.keyStore = keyStore;
+        req.user = decodedUser;
+
+        return next();
+    } catch (err) {
+        throw err
+    }
+})
+
 //  token : payload data stored
 //  keySecret : publicKey, privateKey or SHA algorithms
 const verifyJWT = async (token, keySecret) => {
@@ -105,4 +173,4 @@ const permission = (permission) => {
     }
 }
 
-module.exports = { createTokenPair, authentication, verifyJWT, permission }
+module.exports = { createTokenPair, authentication, verifyJWT, permission, authenticationV2 }
