@@ -1,5 +1,6 @@
 const { ExplainVerbosity } = require("mongodb");
 const { Schema, model } = require("mongoose");
+const { default: slugify } = require("slugify");
 
 const DOCUMENT_NAME = "Product"
 const COLLECTION_NAME = "Products"
@@ -13,6 +14,7 @@ const productSchema = new Schema({
         type: String,
         require: true
     },
+    product_slug: String, // quan-jean-cao-cap
     product_description: String,
     product_price: {
         type: Number,
@@ -30,11 +32,45 @@ const productSchema = new Schema({
     product_attributes: {
         type: Schema.Types.Mixed,
         required: true
+    },
+    product_ratingsAverage: {
+        type: Number,
+        default: 4.5,
+        min: [1, "Rating must from / above 1.0"],
+        max: [5, "Rating must less / equal 5.0"],
+        set: (val) => Math.round(val * 10 / 10)
+    },
+    product_variation: {
+        type: Array, default: []
+    },
+    isDraft: {
+        type: Boolean,
+        default: true,
+        index: true,
+        select: false
+    },
+    isPublished: {
+        type: Boolean,
+        default: false,
+        index: true,
+        select: false
+    },
+    product_shop: {
+        type: Schema.Types.ObjectId,
+        ref: 'Shop'
     }
 }, {
     collection: COLLECTION_NAME,
     timestamps: true
 })
+
+//  Document middleware : run before .save() and .create()
+productSchema.pre('save', function (next) {
+    this.product_slug = slugify(this.product_name, { lower: true });
+    next()
+})
+
+
 const DOCUMENT_NAME_CLOTHING = 'Clothe'
 const DOCUMENT_NAME_ELECTRONIC = 'Electronic'
 const DOCUMENT_NAME_FURNITURE = 'Furniture'
@@ -57,7 +93,7 @@ const electronicSchema = new Schema({
     manufacturer: { type: String, require: true },
     model: String,
     color: String,
-    product_shop: { type: Schema.Types.ObjectId, ref: 'Shop' }
+    product_shop: { type: Schema.Types.ObjectId, ref: 'Shop' },
 }, {
     collection: 'Electronics',
     timestamps: true

@@ -2,6 +2,7 @@
 
 const { BadRequestError } = require("../core/error.response")
 const { product, clothing, electronic, furniture } = require("../models/product.model")
+const { findAllDraftForShop, publishProductById, unPublishProductById, findAllPublishedForShop } = require("../models/repository/product.repo")
 
 class ProductFactory {
     /**
@@ -14,7 +15,12 @@ class ProductFactory {
     static registerProductType = (type, classRef) => {
         ProductFactory.productRegistry[type] = classRef
     }
-
+    /**
+     * 
+     * @param {*} type : mapping types for getting instances  
+     * @param {*} payload : data payload from request body or sth
+     * @returns data has been created success
+     */
     static async createProduct(type, payload) {
         const productClass = ProductFactory.productRegistry[type]; //   return a reference mapping with class instance
 
@@ -22,6 +28,46 @@ class ProductFactory {
 
         //  pass payload as constructor 
         return new productClass(payload).createProduct();
+    }
+
+    /**
+     * 
+     * @param {*} product_shop : the reference shop id of product
+     * @returns data with draft status
+     */
+    static async findAllDraftForShop({ product_shop, limit = 50, skip = 0 }) {
+        const query = { product_shop, isDraft: true };
+        return await findAllDraftForShop({ query, limit, skip })
+    }
+
+    /**
+     * 
+     * @param {*} product_shop : the reference shop id of product
+     * @returns data with published status
+     */
+    static async findAllPublishedForShop({ product_shop, limit = 50, skip = 0 }) {
+        const query = { product_shop, isPublished: true };
+        return await findAllPublishedForShop({ query, limit, skip })
+    }
+
+    /**
+     * 
+     * @param {*} product_shop : the reference shop id of product
+     * @param {*} product_id   : the id of product
+     * @returns 
+     */
+    static async publishProductById({ product_shop, product_id }) {
+        return await publishProductById({ product_shop, product_id })
+    }
+
+    /**
+     * 
+     * @param {*} product_shop : the reference shop id of product
+     * @param {*} product_id   : the id of product
+     * @returns 
+     */
+    static async unPublishProductById({ product_shop, product_id }) {
+        return await unPublishProductById({ product_shop, product_id })
     }
 }
 
