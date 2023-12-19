@@ -1,7 +1,7 @@
 'use strict'
 
 const { SuccessResponses } = require("../core/success.response");
-const ProductFactory = require("../services/product.services");
+const ProductFactory = require("../services/product.services.xxx");
 
 class ProductController {
 
