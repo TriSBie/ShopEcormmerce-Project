@@ -1,5 +1,3 @@
-const dotenv = require("dotenv").config();
-
 const dev = {
     app: {
         port: process.env.DEV_APP_PORT || 3500
@@ -21,7 +19,6 @@ const pro = {
         name: process.env.DEV_DB_NAME || 'shopPRO'
     }
 }
-
 
 const config = { dev, pro }
 const env = process.env.NODE_ENV || 'dev'

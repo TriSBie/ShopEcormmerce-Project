@@ -7,7 +7,10 @@ const { asyncHandler } = require("../../helpers/asyncHandler")
 const { authenticationV2 } = require("../../auth/authUtils")
 
 //  anonymous user can view all products
-router.get("/get-all-product/:keySearch", asyncHandler(productController.getAllProduct))
+router.get("/get-all-product/:keySearch", asyncHandler(productController.searchProductsByText))
+router.post("", asyncHandler(productController.findAllProduct));
+router.post("/get-product-by-id/:shopId", asyncHandler(productController.findProduct));
+
 
 
 //  authentication - check accessToken is legitable or not - prevent a sabotage

@@ -2,7 +2,7 @@
 
 const { BadRequestError } = require("../core/error.response")
 const { product, clothing, electronic, furniture } = require("../models/product.model")
-const { findAllDraftForShop, publishProductById, unPublishProductById, findAllPublishedForShop, searchProductByText } = require("../models/repository/product.repo")
+const { findAllDraftForShop, publishProductById, unPublishProductById, findAllPublishedForShop, searchProductByText, findAllProducts, findProduct } = require("../models/repository/product.repo")
 
 class ProductFactory {
     /**
@@ -72,6 +72,14 @@ class ProductFactory {
 
     static async searchByText({ keySearch }) {
         return await searchProductByText(keySearch)
+    }
+
+    static async findAllProducts({ limit = 30, sort = "ctime", page = 1, filter = { isPublished: true } }) {
+        return await findAllProducts({ limit, sort, page, filter, select: ["product_name", "product_price", "product_thumb"] })
+    }
+
+    static async findProduct({ product_id, unSelect = ['__v', 'product_variation'] }) {
+        return await findProduct({ product_id, unSelect })
     }
 }
 
