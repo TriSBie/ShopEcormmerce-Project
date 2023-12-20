@@ -18,7 +18,7 @@ class ProductController {
         }).send(res)
     }
 
-    getAllDaft = async (req, res) => {
+    getAllDaftProduct = async (req, res) => {
         new SuccessResponses({
             message: 'Get all draft products successfully',
             metadata: await ProductFactory.findAllDraftForShop({
@@ -27,7 +27,7 @@ class ProductController {
         }).send(res)
     }
 
-    getAllPublished = async (req, res) => {
+    getAllPublishedProduct = async (req, res) => {
         new SuccessResponses({
             message: 'Get all published products successfully',
             metadata: await ProductFactory.findAllPublishedForShop({
@@ -53,7 +53,15 @@ class ProductController {
                 product_shop: req.user.userId,
                 product_id: req.params['id']
             })
-            asdasdasd
+        }).send(res)
+    }
+
+    getAllProduct = async (req, res) => {
+        new SuccessResponses({
+            message: 'Get all products successfully',
+            metadata: await ProductFactory.searchByText({
+                keySearch: req.params['keySearch']
+            })
         }).send(res)
     }
 
