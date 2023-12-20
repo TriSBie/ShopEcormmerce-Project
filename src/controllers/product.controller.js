@@ -53,6 +53,7 @@ class ProductController {
                 product_shop: req.user.userId,
                 product_id: req.params['id']
             })
+            asdasdasd
         }).send(res)
     }
 
