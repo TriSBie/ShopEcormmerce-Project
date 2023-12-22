@@ -52,9 +52,6 @@ const unPublishProductById = async ({ product_shop, product_id }) => {
     if (!foundShop) {
         return null;
     }
-    //  change isDraft properties
-    foundShop.isDraft = false;
-    foundShop.isPublished = true
 
     /**
      * updateOne return object Query
@@ -122,9 +119,16 @@ const findProduct = async ({ product_id, unSelect }) => {
     return productFound;
 }
 
+const updateProductById = async ({ productId, bodyUpdate, model, isNew = true }) => {
+    return await model.findByIdAndUpdate(productId, bodyUpdate, {
+        new: isNew
+    })
+}
+
 
 const queryProductBody = async ({ query, skip, limit }) => {
     return await product.find(query)
+        // saving ref, take the object id and in place of by the specify fields
         .populate('product_shop', 'name email -_id')
         .sort({ updateAt: -1 })
         .skip(skip)
@@ -140,5 +144,6 @@ module.exports = {
     publishProductById,
     searchProductByText,
     findAllProducts,
-    findProduct
+    findProduct,
+    updateProductById
 }

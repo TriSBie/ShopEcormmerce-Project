@@ -1,8 +1,10 @@
 'use strict'
 
+const { Types } = require("mongoose")
 const { BadRequestError } = require("../core/error.response")
 const { product, clothing, electronic, furniture } = require("../models/product.model")
-const { findAllDraftForShop, publishProductById, unPublishProductById, findAllPublishedForShop, searchProductByText, findAllProducts, findProduct } = require("../models/repository/product.repo")
+const { findAllDraftForShop, publishProductById, unPublishProductById, findAllPublishedForShop, searchProductByText, findAllProducts, findProduct, updateProductById } = require("../models/repository/product.repo")
+const { updateNestedObjectParser, removeFalsyValues } = require("../utils")
 
 class ProductFactory {
     /**
@@ -26,7 +28,7 @@ class ProductFactory {
 
         if (!productClass) throw new BadRequestError(`Invalid Product Types ${type}`)
 
-        //  pass payload as constructor 
+        //  passed in payload as constructor 
         return new productClass(payload).createProduct();
     }
 
@@ -81,6 +83,14 @@ class ProductFactory {
     static async findProduct({ product_id, unSelect = ['__v', 'product_variation'] }) {
         return await findProduct({ product_id, unSelect })
     }
+
+    static async updateProductById({ type, payload, productId }) {
+        const productClass = ProductFactory.productRegistry[type];
+        //  update nested class 
+        if (!productClass) throw new BadRequestError(`Invalid Product Types ${type}`)
+
+        return new productClass(payload).updateProduct(productId, payload)
+    }
 }
 
 class Product {
@@ -107,6 +117,10 @@ class Product {
     async createProduct(_id) {
         return await product.create({ ...this, _id });
     }
+
+    async updateProduct(productId, bodyUpdate) {
+        return await updateProductById({ productId, bodyUpdate, model: product });
+    }
 }
 
 class Clothing extends Product {
@@ -116,9 +130,28 @@ class Clothing extends Product {
 
         const _id = newClothing._id;
         const newProduct = await super.createProduct(_id);
+
         if (!newProduct) throw new BadRequestError("Create a new Product failed !");
 
         return newProduct;
+    }
+
+    async updateProduct(productId) {
+        /***
+         * 1. throw an error / handling falsy if field has falsy values. 
+         * 2. check where should to be updated ?
+         * */
+        const objectParams = this;
+        const updateNested = updateNestedObjectParser(objectParams);
+        const removedFalsyValue = removeFalsyValues(updateNested)
+        if (objectParams.product_attributes) {
+            // update partial part of product
+            await updateProductById({ productId, bodyUpdate: removedFalsyValue.product_attributes, model: clothing })
+        }
+
+        //  working with third-party should using async await
+        const updateProduct = await super.updateProduct(productId, removedFalsyValue);
+        return updateProduct
     }
 }
 
@@ -148,8 +181,8 @@ class Furniture extends Product {
     }
 }
 
-ProductFactory.registerProductType('clotheSchema', Clothing)
-ProductFactory.registerProductType('electronicSchema', Electronic)
-ProductFactory.registerProductType('furnitureSchema', Furniture)
+ProductFactory.registerProductType('Clothing', Clothing)
+ProductFactory.registerProductType('Electronic', Electronic)
+ProductFactory.registerProductType('Furniture', Furniture)
 
 module.exports = ProductFactory

@@ -110,13 +110,10 @@ const authenticationV2 = asyncHandler(async (req, res, next) => {
         try {
             //  jwt verify (checkedToken, secretOrPublicKey, (err, decoded))
             const refreshToken = req.headers?.[HEADER['REFRESH_TOKEN']]
-            console.log({ refreshToken });
             const decodedUser = jwt.verify(refreshToken, keyStore?.privateKey);
-            console.log({ decodedUser });
             if (userId !== decodedUser?.userId) {
                 throw new AuthFailureError('Invalid userId').getNotice()
             }
-
             req.keyStore = keyStore;
             req.user = decodedUser;
             req.refreshToken = refreshToken;

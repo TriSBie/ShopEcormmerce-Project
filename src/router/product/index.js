@@ -21,6 +21,8 @@ router.put('/update-published/:id', asyncHandler(productController.publishedProd
 router.put('/update-unpublished/:id', asyncHandler(productController.unpublishedProductByShop))
 
 
-router.get("/draft/all", asyncHandler(productController.getAllDaft))
+router.get("/draft/all", asyncHandler(productController.getAllDaftProduct))
 router.get("/published/all", asyncHandler(productController.getAllPublished))
+
+router.patch("/update-product/:product_id", asyncHandler(productController.updateProduct))
 module.exports = router
