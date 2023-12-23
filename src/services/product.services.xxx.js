@@ -5,6 +5,7 @@ const { BadRequestError } = require("../core/error.response")
 const { product, clothing, electronic, furniture } = require("../models/product.model")
 const { findAllDraftForShop, publishProductById, unPublishProductById, findAllPublishedForShop, searchProductByText, findAllProducts, findProduct, updateProductById } = require("../models/repository/product.repo")
 const { updateNestedObjectParser, removeFalsyValues } = require("../utils")
+const { insertInventory } = require("../models/repository/inventory.repo")
 
 class ProductFactory {
     /**
@@ -26,7 +27,7 @@ class ProductFactory {
     static async createProduct(type, payload) {
         const productClass = ProductFactory.productRegistry[type]; //   return a reference mapping with class instance
 
-        if (!productClass) throw new BadRequestError(`Invalid Product Types ${type}`)
+        if (!productClass) throw new BadRequestError(`Invalid Product Types ${type}`).getNotice()
 
         //  passed in payload as constructor 
         return new productClass(payload).createProduct();
@@ -87,7 +88,7 @@ class ProductFactory {
     static async updateProductById({ type, payload, productId }) {
         const productClass = ProductFactory.productRegistry[type];
         //  update nested class 
-        if (!productClass) throw new BadRequestError(`Invalid Product Types ${type}`)
+        if (!productClass) throw new BadRequestError(`Invalid Product Types ${type}`).getNotice()
 
         return new productClass(payload).updateProduct(productId, payload)
     }
@@ -115,7 +116,16 @@ class Product {
     }
 
     async createProduct(_id) {
-        return await product.create({ ...this, _id });
+        const newProduct = await product.create({ ...this, _id });
+        if (newProduct) {
+            // add product_stock in inventory collection
+            await insertInventory({
+                productId: newProduct._id,
+                shopId: this.product_shop,
+                stock: this.product_quantity
+            })
+        }
+        return newProduct;
     }
 
     async updateProduct(productId, bodyUpdate) {
@@ -126,12 +136,12 @@ class Product {
 class Clothing extends Product {
     async createProduct() {
         const newClothing = await clothing.create({ ...this.product_attributes, product_shop: this.product_shop });
-        if (!newClothing) throw new BadRequestError("Create a new Clothe failed !");
+        if (!newClothing) throw new BadRequestError("Create a new Clothe failed !").getNotice();
 
         const _id = newClothing._id;
         const newProduct = await super.createProduct(_id);
 
-        if (!newProduct) throw new BadRequestError("Create a new Product failed !");
+        if (!newProduct) throw new BadRequestError("Create a new Product failed !").getNotice();
 
         return newProduct;
     }
@@ -158,11 +168,11 @@ class Clothing extends Product {
 class Electronic extends Product {
     async createProduct() {
         const newElectronic = await electronic.create({ ...this.product_attributes, product_shop: this.product_shop });
-        if (!newElectronic) throw new BadRequestError("Create a new Electronic failed !");
+        if (!newElectronic) throw new BadRequestError("Create a new Electronic failed !").getNotice();
 
         const _id = newElectronic._id;
         const newProduct = await super.createProduct(_id);
-        if (!newProduct) throw new BadRequestError("Create a new Product failed !");
+        if (!newProduct) throw new BadRequestError("Create a new Product failed !").getNotice();
 
         return newProduct;
     }
@@ -171,11 +181,11 @@ class Electronic extends Product {
 class Furniture extends Product {
     async createProduct() {
         const newFurniture = await furniture.create({ ...this.product_attributes, product_shop: this.product_shop });
-        if (!newFurniture) throw new BadRequestError("Create a new Furniture failed !");
+        if (!newFurniture) throw new BadRequestError("Create a new Furniture failed !").getNotice();
 
         const _id = newFurniture._id;
         const newProduct = await super.createProduct(_id);
-        if (!newProduct) throw new BadRequestError("Create a new Product failed !");
+        if (!newProduct) throw new BadRequestError("Create a new Product failed !").getNotice();
 
         return newProduct;
     }

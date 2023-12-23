@@ -25,7 +25,7 @@ class ConflictRequestError extends ErrorResponse {
 }
 
 class BadRequestError extends ErrorResponse {
-    constructor(message = ReasonPhrases.FORBIDDEN, statusCode = StatusCode.FORBIDDEN) {
+    constructor(message = ReasonPhrases.BAD_REQUEST, statusCode = StatusCode.BAD_REQUEST) {
         console.log(message)
         super(message, statusCode)
     }

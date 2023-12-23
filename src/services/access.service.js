@@ -33,12 +33,12 @@ class AccessService {
             console.log(`[Data parsed from JWT]====: `, { userId, email });
             //  Clear all refreshKeyUsed stored in database
             await KeyTokenService.deleteKeyById(userId)
-            throw new ForbiddenError('Something went wrong ! Please re-login again !')
+            throw new ForbiddenError('Something went wrong ! Please re-login again !').getNotice()
         }
 
         const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
         if (!holderToken) {
-            throw new AuthFailureError('Shop is not registered!');
+            throw new AuthFailureError('Shop is not registered!').getNotice();
         }
 
         // Encrypted data from jwt
@@ -46,7 +46,7 @@ class AccessService {
         const foundShop = await findByEmail({ email });
 
         if (!foundShop) {
-            throw new AuthFailureError('Shop is not registered')
+            throw new AuthFailureError('Shop is not registered').getNotice()
         }
 
         //  re-create new pair of tokens
@@ -78,18 +78,18 @@ class AccessService {
         if (isObtainedRefreshedUsed) {
             // remove old refreshed has been used
             await KeyTokenService.deleteKeyById(userId);
-            throw new ForbiddenError("Something went wrong ! Please re-login again");
+            throw new ForbiddenError("Something went wrong ! Please re-login again").getNotice();
         }
 
         //  compare two refreshToken offcially stored vs current refreshToken
         if (keyStore?.refreshToken !== refreshToken) {
-            throw new AuthFailureError("Shop is not registed")
+            throw new AuthFailureError("Shop is not registed").getNotice();
         }
 
         //  check the validity of authenticated shop
         const foundShop = await findByEmail({ email })
         if (!foundShop) {
-            throw new AuthFailureError("Unauthenticated shop");
+            throw new AuthFailureError("Unauthenticated shop").getNotice();
         }
 
         //create new accessKey & refreshKey
