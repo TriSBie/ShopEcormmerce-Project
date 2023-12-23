@@ -1,4 +1,3 @@
-const { ExplainVerbosity } = require("mongodb");
 const { Schema, model } = require("mongoose");
 const { default: slugify } = require("slugify");
 
