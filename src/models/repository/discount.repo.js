@@ -1,12 +1,9 @@
 'use strict'
 
-const { convertStringToObjectId, getUnSelectData, getSelectData } = require("../../utils")
+const { getUnSelectData, getSelectData } = require("../../utils")
 
-const findDiscountByCodeAndShop = async ({ code, shopId }) => {
-    await discountModel.findOne({
-        discount_code: code,
-        discount_shopId: convertStringToObjectId(shopId)
-    })
+const checkDiscountExist = async ({ model, filter }) => {
+    await model.findOne(filter).lean()
 }
 
 const findAllDiscountCodeUnselect = async ({
@@ -58,4 +55,4 @@ const findAllDiscountCodeSelect = async ({
 }
 
 
-module.exports = { findDiscountByCodeAndShop, findAllDiscountCodeUnselect, findAllDiscountCodeSelect }
+module.exports = { checkDiscountExist, findAllDiscountCodeUnselect, findAllDiscountCodeSelect }
