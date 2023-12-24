@@ -1,12 +1,17 @@
 'use strict'
+
 const _ = require("lodash");
+const { Types } = require("mongoose");
+
+const convertStringToObjectId = id => {
+    return new Types.ObjectId(id);
+}
 
 const getInfoData = ({ object = {}, fields = [] }) => {
     return _.pick(object, fields) //Creates an object composed of the picked object properties.
 }
 
 /**
- * 
  * @param {*} select 
  * @example from ['a','b']
  * @returns {a : 1, b : 1}
@@ -15,7 +20,7 @@ const getSelectData = (select = []) => {
     return Object.fromEntries(select.map((el) => [el, 1]))
 }
 
-const unSelectData = (select = []) => {
+const getUnSelectData = (select = []) => {
     return Object.fromEntries(select.map((el) => [el, 0]))
 }
 
@@ -61,4 +66,4 @@ const updateNestedObjectParser = (obj) => {
     return final;
 }
 
-module.exports = { getInfoData, getSelectData, unSelectData, removeFalsyValues, updateNestedObjectParser }
+module.exports = { getInfoData, getSelectData, getUnSelectData, removeFalsyValues, updateNestedObjectParser, convertStringToObjectId }

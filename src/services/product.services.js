@@ -18,7 +18,7 @@ class ProductFactory {
             case "Furniture":
                 return new Furniture(payload).createProduct();
             default:
-                throw new BadRequestError(`No given type available ${type}`)
+                throw new BadRequestError(`No given type available ${type}`).getNotice()
         }
     }
 }
@@ -52,11 +52,11 @@ class Product {
 class Clothing extends Product {
     async createProduct() {
         const newClothing = await clothing.create({ ...this.product_attributes, product_shop: this.product_shop });
-        if (!newClothing) throw new BadRequestError("Create a new Clothe failed !");
+        if (!newClothing) throw new BadRequestError("Create a new Clothe failed !").getNotice();
 
         const _id = newClothing._id;
         const newProduct = await super.createProduct(_id);
-        if (!newProduct) throw new BadRequestError("Create a new Product failed !");
+        if (!newProduct) throw new BadRequestError("Create a new Product failed !").getNotice();
 
         return newProduct;
     }
@@ -65,11 +65,11 @@ class Clothing extends Product {
 class Electronic extends Product {
     async createProduct() {
         const newElectronic = await electronic.create({ ...this.product_attributes, product_shop: this.product_shop });
-        if (!newElectronic) throw new BadRequestError("Create a new Electronic failed !");
+        if (!newElectronic) throw new BadRequestError("Create a new Electronic failed !").getNotice();
 
         const _id = newElectronic._id;
         const newProduct = await super.createProduct(_id);
-        if (!newProduct) throw new BadRequestError("Create a new Product failed !");
+        if (!newProduct) throw new BadRequestError("Create a new Product failed !").getNotice();
 
         return newProduct;
     }
@@ -78,11 +78,11 @@ class Electronic extends Product {
 class Furniture extends Product {
     async createProduct() {
         const newFurniture = await furniture.create({ ...this.product_attributes, product_shop: this.product_shop });
-        if (!newFurniture) throw new BadRequestError("Create a new Furniture failed !");
+        if (!newFurniture) throw new BadRequestError("Create a new Furniture failed !").getNotice();
 
         const _id = newFurniture._id;
         const newProduct = await super.createProduct(_id);
-        if (!newProduct) throw new BadRequestError("Create a new Product failed !");
+        if (!newProduct) throw new BadRequestError("Create a new Product failed !").getNotice();
 
         return newProduct;
     }

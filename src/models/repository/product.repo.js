@@ -1,4 +1,4 @@
-const { getSelectData, unSelectData } = require("../../utils");
+const { getSelectData, getUnSelectData } = require("../../utils");
 const { product, clothing, electronic, furniture } = require("../product.model");
 const { Types } = require("mongoose")
 
@@ -107,7 +107,7 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
 }
 
 const findProduct = async ({ product_id, unSelect }) => {
-    const unSelectQuery = unSelectData(unSelect);
+    const unSelectQuery = getUnSelectData(unSelect);
 
     const productFound = await product
         .findOne({
