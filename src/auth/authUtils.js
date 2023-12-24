@@ -93,7 +93,6 @@ const authentication = asyncHandler(async (req, res, next) => {
 const authenticationV2 = asyncHandler(async (req, res, next) => {
     // 1. Check userId is missing ?
     const userId = req.headers?.[HEADER['CLIENT_ID']]; //get uerid logged in
-    console.log({ userId });
     if (!userId) {
         throw new AuthFailureError('Unanthenticated').getNotice();
     }
