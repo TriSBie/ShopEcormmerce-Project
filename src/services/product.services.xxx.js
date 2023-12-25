@@ -59,7 +59,8 @@ class ProductFactory {
      * @param {*} product_id   : the id of product
      * @returns 
      */
-    static async publishProductById({ product_shop, product_id }) {
+    static async publishProductById(payload) {
+        const { product_shop, product_id } = payload
         return await publishProductById({ product_shop, product_id })
     }
 
@@ -69,7 +70,8 @@ class ProductFactory {
      * @param {*} product_id   : the id of product
      * @returns 
      */
-    static async unPublishProductById({ product_shop, product_id }) {
+    static async unPublishProductById(payload) {
+        const { product_shop, product_id } = payload
         return await unPublishProductById({ product_shop, product_id })
     }
 

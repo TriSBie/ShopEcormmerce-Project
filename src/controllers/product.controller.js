@@ -46,10 +46,10 @@ class ProductController {
 
 	unpublishedProductByShop = async (req, res) => {
 		new SuccessResponses({
-			message: 'Change published status of products successfully',
+			message: 'Change unPublished status of products successfully',
 			metadata: await ProductFactory.unPublishProductById({
 				product_shop: req.user.userId,
-				product_id: req.params?.id
+				product_id: req.params.id
 			})
 		}).send(res)
 	}

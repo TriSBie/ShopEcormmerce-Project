@@ -1,3 +1,4 @@
+const { NotFoundError } = require("../../core/error.response");
 const { getSelectData, getUnSelectData } = require("../../utils");
 const { product, clothing, electronic, furniture } = require("../product.model");
 const { Types } = require("mongoose")
@@ -18,9 +19,8 @@ const publishProductById = async ({ product_shop, product_id }) => {
     });
 
     if (!foundShop) {
-        return null;
+        throw new NotFoundError("Product are not found! Try again !");
     }
-
     /**
      * updateOne return object Query
      *  {
@@ -31,13 +31,13 @@ const publishProductById = async ({ product_shop, product_id }) => {
      *   matchedCount: 1
      *   }
      */
-    const { modifiedCount } = await foundShop.updateOne({
+    const { modifiedCount } = await product.updateOne({
         _id: new Types.ObjectId(product_id)
     }, {
         $set: {
             isDraft: false,
             isPublished: true
-        }
+        },
     })
 
     return modifiedCount;
@@ -50,9 +50,8 @@ const unPublishProductById = async ({ product_shop, product_id }) => {
     });
 
     if (!foundShop) {
-        return null;
+        throw new NotFoundError("Product are not found! Try again !");
     }
-
     /**
      * updateOne return object Query
      *  {

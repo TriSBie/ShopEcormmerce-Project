@@ -3,7 +3,7 @@
 const { getUnSelectData, getSelectData } = require("../../utils")
 
 const checkDiscountExist = async ({ model, filter }) => {
-    await model.findOne(filter).lean()
+    return await model.findOne(filter).lean()
 }
 
 const findAllDiscountCodeUnselect = async ({

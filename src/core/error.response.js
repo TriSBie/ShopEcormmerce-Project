@@ -19,7 +19,7 @@ class ConflictRequestError extends ErrorResponse {
     getNotice = () => {
         return {
             message: this.message,
-            statusCode: this.status
+            status: this.status,
         }
     }
 }
@@ -32,10 +32,11 @@ class BadRequestError extends ErrorResponse {
     getNotice = () => {
         return {
             message: this.message,
-            statusCode: this.status
+            status: this.status,
         }
     }
 }
+
 
 class AuthFailureError extends ErrorResponse {
     constructor(message = ReasonPhrases.UNAUTHORIZED, statusCode = StatusCode.UNAUTHORIZED) {
@@ -45,20 +46,21 @@ class AuthFailureError extends ErrorResponse {
     getNotice = () => {
         return {
             message: this.message,
-            statusCode: this.statusCode
+            status: this.status,
         }
     }
 }
 
 class NotFoundError extends ErrorResponse {
     constructor(message = ReasonPhrases.NOT_FOUND, statusCode = StatusCode.NOT_FOUND) {
+        console.log(message);
         super(message, statusCode)
     }
 
     getNotice() {
         return {
             message: this.message,
-            statusCode: this.statusCode
+            status: this.status,
         }
     }
 }
@@ -73,7 +75,7 @@ class ForbiddenError extends ErrorResponse {
     getNotice() {
         return {
             message: this.message,
-            statusCode: this.statusCode
+            status: this.status,
         }
     }
 }
