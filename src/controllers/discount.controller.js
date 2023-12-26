@@ -1,7 +1,6 @@
 'use strict'
 
 const { SuccessResponses } = require("../core/success.response");
-const discountModel = require("../models/discount.model");
 const DiscountService = require("../services/discount,.service");
 
 class DiscountController {

@@ -99,7 +99,6 @@ const authenticationV2 = asyncHandler(async (req, res, next) => {
 
     // 2. get KeyServices [publicKey, privateKey, refreshTokenUsed, refreshToken]
     const keyStore = await KeyTokenService.findById(userId);
-    console.log({ keyStore });
 
     if (!keyStore) {
         throw new NotFoundError('Invalid token').getNotice();
