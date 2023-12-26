@@ -80,7 +80,7 @@ class ProductFactory {
     }
 
     static async findAllProducts({ limit = 30, sort = "ctime", page = 1, filter = { isPublished: true } }) {
-        return await findAllProducts({ limit, sort, page, filter, select: ["product_name", "product_price", "product_thumb"] })
+        return await findAllProducts({ limit, sort, page, filter, select: ["product_name", "product_price", "product_thumb", "product_shop"] })
     }
 
     static async findProduct({ product_id, unSelect = ['__v', 'product_variation'] }) {
@@ -178,6 +178,24 @@ class Electronic extends Product {
 
         return newProduct;
     }
+
+    async updateProduct(productId) {
+        /***
+         * 1. throw an error / handling falsy if field has falsy values. 
+         * 2. check where should to be updated ?
+         * */
+        const objectParams = this;
+        const updateNested = updateNestedObjectParser(objectParams);
+        const removedFalsyValue = removeFalsyValues(updateNested)
+        if (objectParams.product_attributes) {
+            // update partial part of product
+            await updateProductById({ productId, bodyUpdate: removedFalsyValue.product_attributes, model: electronic })
+        }
+
+        //  working with third-party should using async await
+        const updateProduct = await super.updateProduct(productId, removedFalsyValue);
+        return updateProduct
+    }
 }
 
 class Furniture extends Product {
@@ -190,6 +208,24 @@ class Furniture extends Product {
         if (!newProduct) throw new BadRequestError("Create a new Product failed !").getNotice();
 
         return newProduct;
+    }
+
+    async updateProduct(productId) {
+        /***
+         * 1. throw an error / handling falsy if field has falsy values. 
+         * 2. check where should to be updated ?
+         * */
+        const objectParams = this;
+        const updateNested = updateNestedObjectParser(objectParams);
+        const removedFalsyValue = removeFalsyValues(updateNested)
+        if (objectParams.product_attributes) {
+            // update partial part of product
+            await updateProductById({ productId, bodyUpdate: removedFalsyValue.product_attributes, model: furniture })
+        }
+
+        //  working with third-party should using async await
+        const updateProduct = await super.updateProduct(productId, removedFalsyValue);
+        return updateProduct
     }
 }
 

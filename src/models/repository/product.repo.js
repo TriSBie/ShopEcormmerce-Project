@@ -1,8 +1,14 @@
 const { NotFoundError } = require("../../core/error.response");
-const { getSelectData, getUnSelectData } = require("../../utils");
+const { getSelectData, getUnSelectData, convertStringToObjectId } = require("../../utils");
 const { product, clothing, electronic, furniture } = require("../product.model");
 const { Types } = require("mongoose")
 
+
+const getProductById = async (product_id) => {
+    return await product.findOne({
+        _id: convertStringToObjectId(product_id)
+    })
+}
 
 const findAllDraftForShop = async ({ query, limit, skip }) => {
     return queryProductBody({ query, limit, skip })
@@ -144,5 +150,6 @@ module.exports = {
     searchProductByText,
     findAllProducts,
     findProduct,
-    updateProductById
+    updateProductById,
+    getProductById
 }

@@ -129,6 +129,8 @@ class AccessService {
      */
 
     static login = async ({ email, password, refreshToken = null }) => {
+        console.log(1)
+
         const foundShop = await findByEmail({ email });
         console.log("========= Found shop : ", foundShop);
 
