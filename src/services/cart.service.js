@@ -44,6 +44,7 @@ class CartService {
             cart_userId: userId,
             cart_state: 'active'
         })
+
         if (!userCart) {
             //  create new cart for user
             return await CartService.createNewCart({ userId, product })
@@ -55,7 +56,32 @@ class CartService {
             return await userCart.save();
         }
 
-        return await CartService.updateUserCartProduct({ userId, product })
+        const foundProductStored = await cartModel.findOne({
+            cart_products: {
+                $elemMatch: {
+                    product_id: product.product_id
+                }
+            }
+        }).select("cart_products.product_id cart_products.quantity")
+
+        let updatProduct = product
+
+        if (foundProductStored) {
+            const oldQuantity = userCart?.cart_products.find((item) => {
+                return (item.product_id.toString() === foundProductStored?.cart_products[0]?.product_id);
+            })
+
+            if (oldQuantity) {
+                updatProduct = {
+                    ...product,
+                    quantity: oldQuantity ? foundProductStored?.cart_products[0].quantity + oldQuantity.quantity : product.quantity
+                }
+            }
+        } else {
+            return await CartService.createNewCart({ userId, product })
+        }
+
+        return await CartService.updateUserCartProduct({ userId, product: updatProduct })
     }
 
     static async addToCartV2({ userId, shop_order_ids = {} }) {
@@ -92,26 +118,28 @@ class CartService {
         const { product_id, quantity: product_quantity } = product;
         const query = {
             cart_userId: userId,
-            "cart_products.product_id": product_id,
+            "cart_products.product_id": product_id.toString(),
             cart_state: 'active'
         }
 
-        const update = {
-            $set: {
-                "cart_products.$.quantity": product_quantity
+        const isSingleIncrementOrDecrement = (product_quantity === 1 || product_quantity === -1)
+        const update =
+            !isSingleIncrementOrDecrement ? {
+                $set: {
+                    "cart_products.$.quantity": product_quantity
+                }
+            } : {
+                $inc: {
+                    "cart_products.$.quantity": product_quantity
+                }
             }
-        }
-
-        console.log({ update })
-
         const option = {
-            new: true,
-            upsert: true
+            upsert: true,
+            new: true
         }
 
         const result = await cartModel.findOneAndUpdate(query, update, option)
-        console.log({ result });
-        return result
+        return result;
     }
 
     static async deleteUserCart({ userId, product_id }) {

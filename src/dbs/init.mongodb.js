@@ -21,7 +21,7 @@ class Database { //create single Class with Singeleton Pattern
                 maxPoolSize: 50 // by default : 100
             })
             .then(_ => console.log(`Connected MongoDB success`))
-            .catch(err => console.log(`Error connection !`))
+            .catch(err => console.log(`Error connection !`, err))
     }
 
     // SINGLETON PATTERN
