@@ -99,7 +99,7 @@ class DiscountService {
 
 	static async getProductsByDiscountCode(payload) {
 		const { code, shopId, userId, limit, page } = payload
-
+		console.log({ code, shopId, userId, limit, page })
 		const foundDiscount = await checkDiscountExist({
 			model: discountModel,
 			filter: {
@@ -123,8 +123,8 @@ class DiscountService {
 						product_shop: convertStringToObjectId(shopId),
 						isPublished: true
 					},
-					limit: +limit,
-					page: +page,
+					limit: Number(Math.abs(limit)),
+					page: Number(Math.abs(page)),
 					select: ['product_name']
 				});
 		} else if (discount_applies_to === 'specific') {
@@ -139,8 +139,8 @@ class DiscountService {
 						},
 						isPublished: true
 					},
-					limit: +limit,
-					page: +page,
+					limit: Number(Math.abs(limit)),
+					page: Number(Math.abs(page)),
 					select: ['product_name']
 				}
 			);

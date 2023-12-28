@@ -130,6 +130,20 @@ const updateProductById = async ({ productId, bodyUpdate, model, isNew = true })
     })
 }
 
+//  check whether product is valid or not
+const checkoutProductByServer = async (products) => {
+    return await Promise.all(products.map(async product => {
+        const foundProduct = await getProductById(product.productId);
+        if (foundProduct) {
+            return {
+                productId: products.productId,
+                quantity: foundProduct.quantity,
+                price: foundProduct.product_price
+            }
+        }
+    }))
+}
+
 
 const queryProductBody = async ({ query, skip, limit }) => {
     return await product.find(query)
@@ -151,5 +165,6 @@ module.exports = {
     findAllProducts,
     findProduct,
     updateProductById,
-    getProductById
+    getProductById,
+    checkoutProductByServer
 }
