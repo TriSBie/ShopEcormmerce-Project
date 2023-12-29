@@ -4,10 +4,10 @@ const { product, clothing, electronic, furniture } = require("../product.model")
 const { Types } = require("mongoose")
 
 
-const getProductById = async (product_id) => {
+const getProductById = async (product_id, select = []) => {
     return await product.findOne({
         _id: convertStringToObjectId(product_id)
-    })
+    }).select(select)
 }
 
 const findAllDraftForShop = async ({ query, limit, skip }) => {
@@ -132,16 +132,13 @@ const updateProductById = async ({ productId, bodyUpdate, model, isNew = true })
 
 //  check whether product is valid or not
 const checkoutProductByServer = async (products) => {
-    return await Promise.all(products.map(async product => {
-        const foundProduct = await getProductById(product.productId);
-        if (foundProduct) {
-            return {
-                productId: products.productId,
-                quantity: foundProduct.quantity,
-                price: foundProduct.product_price
-            }
-        }
-    }))
+    const selectQuery = getSelectData(['_id', 'product_price', 'product_quantity'])
+    const result = products.map(async product => {
+        const foundProduct = await getProductById(product.product_id, selectQuery);
+        return foundProduct
+    })
+
+    return await Promise.all(result);
 }
 
 

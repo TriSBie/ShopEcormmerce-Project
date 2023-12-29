@@ -5,6 +5,7 @@ const { BadRequestError, NotFoundError } = require("../core/error.response");
 const { convertStringToObjectId } = require("../utils");
 const { findAllDiscountCodeUnselect, checkDiscountExist } = require("../models/repository/discount.repo");
 const { findAllProducts } = require("../models/repository/product.repo");
+const { default: mongoose } = require("mongoose");
 
 /**
  * Step by step for generate new discount
@@ -87,7 +88,7 @@ class DiscountService {
 			discount_shopId: shopId,
 			discount_is_active: is_active,
 			discount_applies_to: applies_to,
-			discount_product_ids: applies_to === "all" ? [] : product_ids
+			discount_product_ids: applies_to === "all" ? [] : convertStringToObjectId()
 		})
 
 		return newDiscount;
@@ -114,7 +115,6 @@ class DiscountService {
 
 		const { discount_applies_to, discount_product_ids } = foundDiscount;
 		let products;
-
 		if (discount_applies_to === 'all') {
 			//  get all products belong to specific shop by discount
 			products = await findAllProducts(
@@ -133,9 +133,7 @@ class DiscountService {
 				{
 					filter: {
 						_id: {
-							$in: {
-								discount_product_ids,
-							},
+							$in: discount_product_ids,
 						},
 						isPublished: true
 					},
@@ -151,8 +149,8 @@ class DiscountService {
 	static getAllDiscountCodeByShop = async (payload) => {
 		const { limit, page, shopId } = payload;
 		const discounts = await findAllDiscountCodeUnselect({
-			limit: +limit,
-			page: +page,
+			limit: Number(Math.abs(limit)),
+			page: Number(Math.abs(page)),
 			model: discountModel,
 			filter: {
 				discount_shopId: convertStringToObjectId(shopId),

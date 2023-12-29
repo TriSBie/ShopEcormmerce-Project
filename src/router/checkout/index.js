@@ -10,3 +10,5 @@ const checkoutController = require("../../controllers/checkout.controller")
 
 router.use(authenticationV2)
 router.post("/review", asyncHandler(checkoutController.checkout));
+
+module.exports = router
