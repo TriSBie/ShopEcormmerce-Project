@@ -1,5 +1,3 @@
-'use strict'
-
 const { convertStringToObjectId } = require("../../utils")
 const cartModel = require("../cart.model")
 
@@ -10,4 +8,4 @@ const findCartById = async (cartId) => {
     }).lean()
 }
 
-module.export = findCartById
+module.exports = { findCartById } 
