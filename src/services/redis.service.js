@@ -27,7 +27,7 @@ const acquireLock = async ({ productId, cartId, quantity }) => {
             //  privilege to add update_key
             return null;
         } else {
-            //  try until get key success
+            //  try until get key success - SLEEP FUNCTION
             await new Promise((resolve) => setTimeout(resolve, 50))
         }
     }
