@@ -1,8 +1,11 @@
 
-const { NotFoundError } = require("../core/error.response");
+const { NotFoundError, BadRequestError } = require("../core/error.response");
+const orderModel = require("../models/order.model");
 const { findCartById } = require("../models/repository/cart.repo");
 const { checkoutProductByServer } = require("../models/repository/product.repo");
 const { getDiscountAmount } = require("./discount,.service");
+const InventoryService = require("./inventory.service");
+const { acquireLock, releaseLock } = require("./redis.service");
 
 class CheckoutService {
 	/**
@@ -90,7 +93,7 @@ class CheckoutService {
 						userId: userId,
 						products: checkoutProductServerResponse
 					})
-					console.log({ totalOrder, totalPrice, discount })
+
 					if (discount > 0) {
 						checkoutOrder.totalDiscount += discount;
 						itemCheckout.totalPriceApplyDiscount = totalCheckoutPrice - discount
@@ -110,6 +113,55 @@ class CheckoutService {
 			checkoutOrder
 		}
 	}
+
+	static async orderByUser({
+		shop_carts_item,
+		userId,
+		cartId,
+		user_address = {},
+		user_payment = {}
+	}) {
+		const { shop_carts_item, shop_carts_item_new, checkoutOrder } = await CheckoutService.checkoutReview({
+			cartId, userId, shop_carts_item
+		})
+
+		//	validating quantity from products inventory
+		const products = shop_carts_item_new.flatMap((product) => product.item_products)
+
+		const acquireProduct = [];
+		for (let i = 0; i < products.length; i++) {
+			const { product_id, quantity, price } = products[i];
+			const keyLock = await acquireLock({ productId: product_id, cartId, quantity })
+			acquireProduct.push(keyLock ? true : false);
+
+			if (keyLock) {
+				await releaseLock(keyLock)
+			}
+		}
+		if (acquireProduct.includes(false)) {
+			throw new BadRequestError("Some products has been new lastest updated ")
+		}
+
+		const newOrder = orderModel.create({
+			order_userId: userId,
+			order_checkout: checkoutOrder,
+			order_shipping: user_address,
+			order_payment: user_payment,
+			order_products: shop_carts_item_new
+		})
+
+		//	if checkout successfully => remove in-process cart
+		if (newOrder) {
+			await InventoryService.addStockToInventory({
+				product_id, stock, shopId, location
+			})
+		}
+	}
+
+	static async getOrderByUsers() { }
+	static async getOneOrderByUsers() { }
+	static async calcelOrderByUser() { }
+	static async updateOrderStatusByShop() { }
 
 }
 
