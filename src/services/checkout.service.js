@@ -113,7 +113,7 @@ class CheckoutService {
 	}
 
 	static async orderByUser({
-		shop_carts_item,
+		shop_carts_items,
 		userId,
 		cartId,
 		user_address = {},

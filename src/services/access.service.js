@@ -3,7 +3,7 @@
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const shopModel = require("../models/shop.model");
-const KeyTokenService = require("./keytoken.services");
+const KeyTokenService = require("./keytoken.service");
 const { getInfoData } = require("../utils/index");
 const { BadRequestError, AuthFailureError, ForbiddenError } = require("../core/error.response");
 const { findByEmail } = require("./shop.service");
