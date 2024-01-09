@@ -18,6 +18,14 @@ app.use(bodyParser.json()) //or express.json()
 require('./dbs/init.mongodb')
 countConnect()
 
+
+// require("./__test/inventory.test")
+// const productTest = require("./__test/product.test")
+// productTest.purchaseProduct({
+//     "product_id": "product:001",
+//     "quantity": 10,
+// })
+
 // init routes
 app.use('/', router)
 
