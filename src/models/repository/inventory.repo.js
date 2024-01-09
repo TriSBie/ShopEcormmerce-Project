@@ -1,5 +1,5 @@
 const { Type } = require("mongoose")
-const inventoryModel = require("../inventory,model")
+const inventoryModel = require("../inventory.model")
 const { convertStringToObjectId } = require("../../utils")
 
 const insertInventory = async ({ productId, shopId, location = 'unknown', stock }) => {

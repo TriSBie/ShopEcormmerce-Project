@@ -1,8 +1,10 @@
 
 const { NotFoundError, BadRequestError } = require("../core/error.response");
+const orderModel = require("../models/order.model");
 const { findCartById } = require("../models/repository/cart.repo");
 const { checkoutProductByServer } = require("../models/repository/product.repo");
 const { getDiscountAmount } = require("./discount,.service");
+const InventoryService = require("./inventory.service");
 const { acquireLock, releaseLock } = require("./redis.service");
 
 class CheckoutService {
@@ -140,7 +142,27 @@ class CheckoutService {
 			throw new BadRequestError("Some products has been new lastest updated ")
 		}
 
+		const newOrder = orderModel.create({
+			order_userId: userId,
+			order_checkout: checkoutOrder,
+			order_shipping: user_address,
+			order_payment: user_payment,
+			order_products: shop_carts_item_new
+		})
+
+		//	if checkout successfully => remove in-process cart
+		if (newOrder) {
+			await InventoryService.addStockToInventory({
+				product_id, stock, shopId, location
+			})
+		}
 	}
+
+	static async getOrderByUsers() { }
+	static async getOneOrderByUsers() { }
+	static async calcelOrderByUser() { }
+	static async updateOrderStatusByShop() { }
+
 }
 
 module.exports = CheckoutService
