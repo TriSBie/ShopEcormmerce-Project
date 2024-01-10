@@ -5,7 +5,6 @@ const { BadRequestError, NotFoundError } = require("../core/error.response");
 const { convertStringToObjectId } = require("../utils");
 const { findAllDiscountCodeUnselect, checkDiscountExist } = require("../models/repository/discount.repo");
 const { findAllProducts } = require("../models/repository/product.repo");
-const { default: mongoose } = require("mongoose");
 
 /**
  * Step by step for generate new discount
@@ -97,6 +96,7 @@ class DiscountService {
 	static async updateDiscountCode() {
 		return
 	}
+
 
 	static async getProductsByDiscountCode(payload) {
 		const { code, shopId, userId, limit, page } = payload

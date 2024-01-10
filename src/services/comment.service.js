@@ -128,10 +128,74 @@ class CommentService {
             throw error
         }
     }
-    static async deleteComment(commentId) {
+
+    /**
+     * @description: delete comment by id  
+     * @param {comment_productId, commentId}
+     * @returns comment
+     */
+
+    /* 
+     *  ==============Step by Step ==============
+     *  find comment by id 
+     *  get left and right value of comment => return width range of deleted comment
+     *  delete comments in range of left and right value of deleted comment
+     *  minus left and right value of comment by width range of deleted comment 
+     *  ========================================
+     */
+    static async deleteComment({
+        comment_productId,
+        commentId
+    }) {
         try {
-            const comment = await commentSchema.findByIdAndDelete(commentId)
-            return comment
+
+            const comments = await commentSchema.find({
+                comment_productId: convertStringToObjectId(comment_productId)
+            })
+
+            if (!comments) {
+                throw new NotFoundError('Comments not found')
+            }
+
+            const comment = await commentSchema.findOne({
+                _id: convertStringToObjectId(commentId),
+                comment_productId: convertStringToObjectId(comment_productId),
+            })
+
+            if (!comment) {
+                throw new NotFoundError('Comment not found')
+            }
+
+            const leftComment = comment.comment_left;
+            const rightComment = comment.comment_right;
+            const width = rightComment - leftComment + 1;
+
+            // delete comments self and children
+            const deleteComment = await commentSchema.deleteMany({
+                comment_productId: convertStringToObjectId(comment_productId),
+                comment_left: { $gte: leftComment },
+                comment_right: { $lte: rightComment }
+            })
+
+            if (!deleteComment) {
+                throw new NotFoundError('Delete comment unsuccessfully')
+            }
+
+            await commentSchema.updateMany({
+                comment_productId: convertStringToObjectId(comment_productId),
+                comment_left: { $gt: leftComment }
+            }, {
+                $inc: { comment_left: -width }
+            })
+
+            await commentSchema.updateMany({
+                comment_productId: convertStringToObjectId(comment_productId),
+                comment_right: { $gt: rightComment }
+            }, {
+                $inc: { comment_right: -width }
+            })
+
+            return deleteComment;
         } catch (error) {
             throw error
         }
