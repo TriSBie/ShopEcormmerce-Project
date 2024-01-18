@@ -6,6 +6,7 @@ const { product, clothing, electronic, furniture } = require("../models/product.
 const { findAllDraftForShop, publishProductById, unPublishProductById, findAllPublishedForShop, searchProductByText, findAllProducts, findProduct, updateProductById } = require("../models/repository/product.repo")
 const { updateNestedObjectParser, removeFalsyValues } = require("../utils")
 const { insertInventory } = require("../models/repository/inventory.repo")
+const { pushNotifiSystem } = require("./notification.service")
 
 class ProductFactory {
     /**
@@ -44,7 +45,6 @@ class ProductFactory {
     }
 
     /**
-     * 
      * @param {*} product_shop : the reference shop id of product
      * @returns data with published status
      */
@@ -125,6 +125,21 @@ class Product {
                 productId: newProduct._id,
                 shopId: this.product_shop,
                 stock: this.product_quantity
+            })
+
+            pushNotifiSystem({
+                type: 'SHOP-001',
+                receiverId: 1,
+                senderId: this.product_shop,
+                options: {
+                    productName: this.product_name,
+                    shop_name: this.product_shop
+                }
+            }).then((res) => {
+                console.log(res)
+            }
+            ).catch((err) => {
+                console.log(err)
             })
         }
         return newProduct;

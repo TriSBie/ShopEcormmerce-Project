@@ -6,6 +6,8 @@ const compression = require("compression");
 const { countConnect, checkOverLoad } = require("./helpers/check.connect")
 const router = require("./router/index")
 const bodyParser = require("body-parser")
+// const swagger = require("./utils/swagger")
+// // const todo = require('../src/services/todo.service')
 
 // init middlewares
 app.use(morgan('dev'))

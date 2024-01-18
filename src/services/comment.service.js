@@ -25,7 +25,6 @@ class CommentService {
         content, parentCommentId = null
     }) {
         try {
-
             const comment = await commentSchema.create({
                 comment_productId: productId,
                 comment_userId: userId,
@@ -157,6 +156,7 @@ class CommentService {
                 throw new NotFoundError('Comments not found')
             }
 
+            //  get all comments belong to productId
             const comment = await commentSchema.findOne({
                 _id: convertStringToObjectId(commentId),
                 comment_productId: convertStringToObjectId(comment_productId),

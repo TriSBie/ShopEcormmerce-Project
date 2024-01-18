@@ -29,6 +29,9 @@ class CartService {
             $addToSet: {
                 cart_products: product,
             },
+            $incr: {
+                cart_product_count: 1
+            }
         }
         const option = {
             upsert: true,
@@ -53,6 +56,7 @@ class CartService {
         // if cart exist with empty product
         if (!userCart.cart_products.length) {
             userCart.cart_products = [product];
+            userCart.cart_product_count = 1;
             return await userCart.save();
         }
 
